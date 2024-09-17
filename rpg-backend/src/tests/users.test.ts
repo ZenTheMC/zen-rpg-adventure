@@ -1,6 +1,6 @@
 // src/tests/users.test.ts
 import request from "supertest";
-import app from "../index";
+import { app } from "../index";
 
 describe("User Registration", () => {
   it("should register a new user", async () => {

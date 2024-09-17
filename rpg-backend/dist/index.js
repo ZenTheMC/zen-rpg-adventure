@@ -51,4 +51,5 @@ mongoose_1.default
     .connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.log(err));
+exports.default = app;
 //# sourceMappingURL=index.js.map

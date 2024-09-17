@@ -2,6 +2,15 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import usersRouter from "./routes/users";
+import charactersRouter from "./routes/characters";
+import inventoryRouter from "./routes/inventory";
+import questsRouter from "./routes/quests";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,22 +21,15 @@ app.use(express.json());
 
 // MongoDB Connection
 mongoose
-  .connect("mongodb://localhost:27017/your-game-db", {
-    // useNewUrlParser: true, // No longer necessary in newer versions
-    // useUnifiedTopology: true, // No longer necessary in newer versions
-  })
+  .connect(process.env.MONGO_URI as string)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
 // Routes
-app.use("/api/users", require("./routes/users"));
-app.use("/api/characters", require("./routes/characters"));
-app.use("/api/inventory", require("./routes/inventory"));
-app.use("/api/quests", require("./routes/quests"));
-
-// Socket.io Setup
-import { createServer } from "http";
-import { Server } from "socket.io";
+app.use("/api/users", usersRouter);
+app.use("/api/characters", charactersRouter);
+app.use("/api/inventory", inventoryRouter);
+app.use("/api/quests", questsRouter);
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -40,6 +42,20 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  socket.on("attack", (data) => {
+    // Handle attack logic
+    io.emit("attackResult", {
+      /* ... */
+    });
+  });
+
+  socket.on("move", (data) => {
+    // Handle move logic
+    io.emit("moveResult", {
+      /* ... */
+    });
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
@@ -50,10 +66,4 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-import dotenv from "dotenv"; // dotenv no longer needed in Node v20.6, but I'm using v18.18 apparently.)
-dotenv.config();
-
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+export { app };
