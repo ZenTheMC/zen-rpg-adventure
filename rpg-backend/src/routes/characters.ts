@@ -11,3 +11,5 @@ router.post("/", authenticateJWT, createCharacter);
 router.get("/", authenticateJWT, getCharacters);
 
 export default router;
+
+// comment
